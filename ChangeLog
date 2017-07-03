@@ -1,0 +1,1429 @@
+------------------------------------------------------------
+revno: 3617
+committer: Karen Langford <karen.langford@oracle.com>
+branch nick: mysql-5.1.60-release
+timestamp: Sat 2011-10-29 20:08:40 +0200
+message:
+  Patch to fix stdint.h missing from pre Solaris 10 versions.
+------------------------------------------------------------
+revno: 3616
+committer: Karen Langford <karen.langford@oracle.com>
+branch nick: mysql-5.1.60-release
+timestamp: Fri 2011-10-28 16:40:46 +0200
+message:
+  Patch to fix libedit vis.h problem (OSX/FreeBSD)
+------------------------------------------------------------
+revno: 3615
+tags: clone-5.1.60-build
+committer: Marko M?kel? <marko.makela@oracle.com>
+branch nick: mysql-5.1-security
+timestamp: Wed 2011-10-26 12:23:57 +0300
+message:
+  Revert revno:3452.71.32 (Bug#12612184 fix).
+  
+  Bug#12612184 RACE CONDITION AFTER BTR_CUR_PESSIMISTIC_UPDATE()
+  
+  The fix introduced potentially more severe crash recovery problems
+  than the bug causes. Revert the fix for now.
+------------------------------------------------------------
+revno: 3614
+committer: Marko M?kel? <marko.makela@oracle.com>
+branch nick: mysql-5.1-security
+timestamp: Wed 2011-10-26 11:44:28 +0300
+message:
+  Revert most of revno 3560.9.1 (Bug#12704861)
+  
+  This was an attempt to address problems with the Bug#12612184 fix.
+  Even with this follow-up fix, crash recovery can be broken.
+  Let us fix the bug later.
+------------------------------------------------------------
+revno: 3613
+committer: Marko M?kel? <marko.makela@oracle.com>
+branch nick: mysql-5.1-security
+timestamp: Wed 2011-10-26 09:38:28 +0300
+message:
+  Copy and adapt innodb_misc1.test from innodb to innodb_plugin.
+------------------------------------------------------------
+revno: 3612
+committer: Marko M?kel? <marko.makela@oracle.com>
+branch nick: mysql-5.1-security
+timestamp: Wed 2011-10-26 09:34:32 +0300
+message:
+  Fix results after Bug#12661768 fix.
+------------------------------------------------------------
+revno: 3611
+committer: Marko M?kel? <marko.makela@oracle.com>
+branch nick: mysql-5.1-security
+timestamp: Tue 2011-10-25 17:58:34 +0300
+message:
+  Fix results after Bug#12661768 fix.
+------------------------------------------------------------
+revno: 3610
+committer: Marko M?kel? <marko.makela@oracle.com>
+branch nick: mysql-5.1-security
+timestamp: Tue 2011-10-25 17:33:38 +0300
+message:
+  Bug#13002783 PARTIALLY UNINITIALIZED CASCADE UPDATE VECTOR
+  
+  In the ON UPDATE CASCADE clause of FOREIGN KEY constraints, the
+  calculated update vector was not fully initialized. This bug was
+  introduced in the InnoDB Plugin when implementing support for
+  ROW_FORMAT=DYNAMIC.
+  
+  Additionally, the data type information was not initialized, but
+  apparently it has never been needed in this case.  Nevertheless, it is
+  not good programming practice to pass uninitialized values around.
+  
+  calc_row_difference(): Declare the update field uninitialized in
+  Valgrind. Copy the data type information as well, except when the
+  field is SQL NULL. In the built-in InnoDB, initialize
+  ufield->extern_storage = FALSE (an initialization bug that had gone
+  unnoticed this far). The InnoDB Plugin and later have this flag to
+  dfield_t and have always initialized it properly.
+  
+  row_ins_cascade_calc_update_vec(): Reduce the scope of some
+  pointers. Initialize orig_len. (This caused the bug in InnoDB Plugin
+  and later.)
+  
+  row_ins_foreign_check_on_constraint(): Simplify a condition. Declare
+  the update vector uninitialized.
+  
+  rb:771 approved by Jimmy Yang
+------------------------------------------------------------
+revno: 3609
+committer: Vasil Dimov <vasil.dimov@oracle.com>
+branch nick: mysql-5.1-security
+timestamp: Tue 2011-10-25 16:46:38 +0300
+message:
+  Fix Bug#12661768 UPDATE IGNORE CRASHES SERVER IF TABLE IS INNODB AND IT IS
+  PARENT FOR OTHER ONE
+  
+  Do not try to lookup key_nr'th key in 'table' because there may not be such
+  a key there. key_nr is the number of the key in the _child_ table name, not
+  in the parent table.
+  
+  Instead just print the fields of the record that are covered by the first key
+  defined on the parent table.
+  
+  This bug gets a better fix in MySQL 5.6, which is too risky for 5.1 and 5.5.
+  
+  Approved by:	Jon Olav Hauglid (via IM)
+------------------------------------------------------------
+revno: 3608 [merge]
+committer: Alexander Nozdrin <alexander.nozdrin@oracle.com>
+branch nick: mysql-5.1-security
+timestamp: Mon 2011-10-24 12:44:27 +0400
+message:
+  Auto-merge from mysql-5.1.
+    ------------------------------------------------------------
+    revno: 3560.6.52
+    committer: Nirbhay Choubey <nirbhay.choubey@oracle.com>
+    branch nick: mysql-5.1
+    timestamp: Mon 2011-10-24 13:35:28 +0530
+    message:
+      WL#5945 - Improve libedit library
+      
+      Fixed a misplaced parenthesis, injected due to
+      syncing from libedit CVS head.
+    ------------------------------------------------------------
+    revno: 3560.6.51
+    committer: Nirbhay Choubey <nirbhay.choubey@oracle.com>
+    branch nick: B13106585-5.1
+    timestamp: Fri 2011-10-21 18:10:12 +0530
+    message:
+      Bug#13106585 PUSH FOR "WL#5945 : IMPROVE LIBEDIT LIBRARY"
+                   BREAKS SOURCE RELEASE BUILD
+      
+      Some of the required files were not getting copied while
+      performing 'make dist' and hence the build failed for
+      the created distribution source.
+      
+      Added the missing files to Makefile.am.
+    ------------------------------------------------------------
+    revno: 3560.6.50 [merge]
+    committer: Sergey Vojtovich <sergey.vojtovich@oracle.com>
+    branch nick: mysql-5.1-push
+    timestamp: Fri 2011-10-21 09:30:56 +0400
+    message:
+      Merge.
+        ------------------------------------------------------------
+        revno: 3560.15.1
+        committer: Sergey Vojtovich <sergey.vojtovich@oracle.com>
+        branch nick: mysql-5.1-bug49030
+        timestamp: Thu 2011-10-20 15:03:22 +0400
+        message:
+          BUG#11757032 - 49030: OPTIMIZE TABLE BREAKS MYISAM TABLE WHEN
+                         USING MYISAM_USE_MMAP ON WINDOWS
+          
+          When OPTIMIZE/REPAIR TABLE is switching to new data file,
+          old data file is removed while memory mapping is still
+          active.
+          
+          With 5.1 implementation of nt_share_delete() it is not
+          permitted to remove mmaped file.
+          
+          This fix disables memory mapping for mi_repair() operations.
+    ------------------------------------------------------------
+    revno: 3560.6.49
+    committer: Marko M?kel? <marko.makela@oracle.com>
+    branch nick: mysql-5.1
+    timestamp: Fri 2011-10-21 06:32:16 +0300
+    message:
+      Bug#13116045 Compilation failure using GCC 4.6.1 in btr/btr0cur.c
+      
+      btr_record_not_null_field_in_rec(): Remove the parameter rec.
+      Use rec_offs_nth_sql_null() instead of rec_get_nth_field().
+      
+      rb:788 approved by Jimmy Yang
+    ------------------------------------------------------------
+    revno: 3560.6.48
+    committer: Bjorn Munch <bjorn.munch@oracle.com>
+    branch nick: testcr-51
+    timestamp: Wed 2011-10-19 13:36:57 +0200
+    message:
+      Remove copyright header from parser_stack.test
+    ------------------------------------------------------------
+    revno: 3560.6.47
+    committer: Nirbhay Choubey <nirbhay.choubey@oracle.com>
+    branch nick: B13102538-5.1
+    timestamp: Tue 2011-10-18 22:47:32 +0530
+    message:
+      Bug#13102538 : COMPILE ERROR ON SOLARIS WHEN COMPILING
+                     WITH LIBEDIT
+      
+      Libedit won't build on platforms that do not provide
+      "sys/cdefs.h".
+      
+      Removed the inclusion of cdefs.h from all files
+      other that sys.h, which includes this file only
+      when the header is found while configuring.
+    ------------------------------------------------------------
+    revno: 3560.6.46
+    committer: Nirbhay Choubey <nirbhay.choubey@oracle.com>
+    branch nick: mysql-5.1
+    timestamp: Fri 2011-10-14 01:03:25 +0530
+    message:
+      WL#5945 : Improve libedit library
+      
+      Updated libedit library.
+    ------------------------------------------------------------
+    revno: 3560.6.45
+    committer: Marko M?kel? <marko.makela@oracle.com>
+    branch nick: mysql-5.1
+    timestamp: Wed 2011-10-12 09:00:49 +0300
+    message:
+      Bug#13006367 62487: innodb takes 3 minutes to clean up the adaptive
+      hash index at shutdown
+      
+      btr_search_disable(): Just drop the entire adaptive hash index,
+      without dropping every record separately.
+      
+      buf_pool_clear_hash_index(): Renamed and simplified from
+      buf_pool_drop_hash_index(). Set block->index = NULL for every block in
+      the buffer pool. Do not release the btr_search_latch. The caller will
+      have to adjust other data structures.
+      
+      Remove block->is_hashed. It is redundant, should be always equal to
+      block->index != NULL.
+      
+      Remove btr_search_fully_disabled, btr_search_enabled_mutex, and
+      SYNC_SEARCH_SYS_CONF. We drop the AHI in one pass, without releasing
+      the btr_search_latch in between.
+      
+      Replace void* with const rec_t* and add assertions on btr_search_latch
+      and btr_search_enabled to ha0ha.h, ha0ha.ic, ha0ha.c.
+      
+      page_set_max_trx_id(): Ignore the adaptive hash index. I forgot to
+      push this in rb:750.
+      
+      btr0sea.c: Always after acquiring btr_search_latch, check for
+      block->index==NULL or !btr_search_enabled. We can now set
+      block->index=NULL while only holding btr_search_latch in exclusive
+      mode. Always acquire btr_search_latch before reading block->index,
+      except in shortcuts when testing for block->index == NULL.
+      
+      ha_clear(), ha_search(): Unused function, remove.
+      
+      buf_page_peek_if_search_hashed(): Remove. This function may avoid
+      latching a page at the cost of doing a duplicate buf_pool->page_hash
+      lookup.
+      
+      rb:775 approved by Inaam Rana
+------------------------------------------------------------
+revno: 3607
+committer: Alexander Nozdrin <alexander.nozdrin@oracle.com>
+branch nick: mysql-5.1-security
+timestamp: Thu 2011-10-20 18:06:41 +0400
+message:
+  Fix Windows-build failure: use my_snprintf() instead of snprintf().
+------------------------------------------------------------
+revno: 3606
+committer: Tatjana Azundris Nuernberg <tatjana.nuernberg@oracle.com>
+branch nick: 51-11765687t
+timestamp: Wed 2011-10-19 03:21:31 +0100
+message:
+  Bug12589870 post-merge fixes for Sparc64 and friends
+------------------------------------------------------------
+revno: 3605 [merge]
+committer: Tor Didriksen <tor.didriksen@oracle.com>
+branch nick: 5.1-security
+timestamp: Fri 2011-10-14 10:44:27 +0200
+message:
+  merge 5.0-security => 5.1 security
+    ------------------------------------------------------------
+    revno: 1810.3997.35
+    committer: Tor Didriksen <tor.didriksen@oracle.com>
+    branch nick: 5.0-security
+    timestamp: Fri 2011-10-14 10:09:53 +0200
+    message:
+      Bug#12563865 ROUNDED,TMP_BUF,DECIMAL_VALUE STACK CORRUPTION IN ALL VERSIONS >=5.0
+      
+      Buffer over-run on all platforms, crash on windows, wrong result on other platforms,
+      when rounding numbers which start with 999999999 and have
+      precision = 9 or 18 or 27 or 36 ...
+------------------------------------------------------------
+revno: 3604 [merge]
+committer: Georgi Kodinov <Georgi.Kodinov@Oracle.com>
+branch nick: merge-5.1-security
+timestamp: Wed 2011-10-12 14:42:42 +0300
+message:
+  empty weave merge mysql-5.0-security->mysql-5.1-security
+    ------------------------------------------------------------
+    revno: 1810.3997.34 [merge]
+    committer: Georgi Kodinov <Georgi.Kodinov@Oracle.com>
+    branch nick: merge-5.0-security
+    timestamp: Wed 2011-10-12 14:33:09 +0300
+    message:
+      auto-merge mysql-5.0->mysql-5.0-security
+------------------------------------------------------------
+revno: 3603 [merge]
+committer: Georgi Kodinov <Georgi.Kodinov@Oracle.com>
+branch nick: merge-5.1-security
+timestamp: Wed 2011-10-12 14:34:44 +0300
+message:
+  auto-merge mysql-5.1->mysql-5.1-security
+    ------------------------------------------------------------
+    revno: 3560.6.44
+    committer: Vinay Fisrekar <vinay.fisrekar@oracle.com>
+    branch nick: mysql-5.1
+    timestamp: Wed 2011-10-12 10:10:52 +0530
+    message:
+      bug#11766457 - adjusting/modifying the the tests as tests were failing if system time zone is set differently.
+    ------------------------------------------------------------
+    revno: 3560.6.43 [merge]
+    committer: Bjorn Munch <bjorn.munch@oracle.com>
+    branch nick: merge-51
+    timestamp: Wed 2011-10-05 22:38:00 +0200
+    message:
+      merge 5.1-mtr => 5.1
+        ------------------------------------------------------------
+        revno: 2728.17.251
+        committer: Bjorn Munch <bjorn.munch@oracle.com>
+        branch nick: iffcign-51
+        timestamp: Mon 2011-10-03 13:41:59 +0200
+        message:
+          backporting 11766169, fixing 13034450
+        ------------------------------------------------------------
+        revno: 2728.17.250
+        committer: Bjorn Munch <bjorn.munch@oracle.com>
+        branch nick: iffcign-51
+        timestamp: Tue 2011-09-27 12:56:05 +0200
+        message:
+          Bug #12844282 62075: MTR TESTS SHOULD NOT HAVE TO SAVE & RESET INNODB_FILE_FORMAT_CHECK
+            Added 'innodb_file_format_check' as variable to ignore change to.
+            Tests that had to restore this amended
+            Two tests assumed it to be Antelope, make sure these run on a freshly
+              started server
+            For 5.5, apparently innodb_file_format_max is the one to ignore
+    ------------------------------------------------------------
+    revno: 3560.6.42 [merge]
+    committer: Sergey Glukhov <sergey.glukhov@oracle.com>
+    branch nick: mysql-5.1
+    timestamp: Wed 2011-10-05 14:22:32 +0400
+    message:
+      automerge
+        ------------------------------------------------------------
+        revno: 3560.14.1
+        committer: Marko M?kel? <marko.makela@oracle.com>
+        branch nick: mysql-5.1
+        timestamp: Wed 2011-10-05 12:01:47 +0300
+        message:
+          Add InnoDB UNIV_SYNC_DEBUG assertions to rw-lock code.
+          
+          rw_lock_x_lock_func(): Assert that the thread is not already holding
+          the lock in a conflicting mode (RW_LOCK_SHARED).
+          
+          rw_lock_s_lock_func(): Assert that the thread is not already holding
+          the lock in a conflicting mode (RW_LOCK_EX).
+    ------------------------------------------------------------
+    revno: 3560.6.41
+    committer: Sergey Glukhov <sergey.glukhov@oracle.com>
+    branch nick: mysql-5.1
+    timestamp: Wed 2011-10-05 13:28:20 +0400
+    message:
+      Bug#11747970 34660: CRASH WHEN FEDERATED TABLE LOSES CONNECTION DURING INSERT ... SELECT
+      Problematic query:
+      insert ignore into `t1_federated` (`c1`) select `c1` from  `t1_local` a
+      where not exists (select 1 from `t1_federated` b where a.c1 = b.c1);
+      When this query is killed in another connection it could lead to crash.
+      The problem is follwing:
+      An attempt to obtain table statistics for subselect table in killed query
+      fails with an error. So JOIN::optimize() for subquery is failed but
+      it does not prevent further subquery evaluation.
+      At the first subquery execution JOIN::optimize() is called
+      (see subselect_single_select_engine::exec()) and fails with
+      an error. 'executed' flag is set to TRUE and it prevents
+      further subquery evaluation. At the second call
+      JOIN::optimize() does not happen as 'JOIN::optimized' is TRUE
+      and in case of uncacheable subquery the 'executed' flag is set
+      to FALSE before subquery evaluation. So we loose 'optimize stage'
+      error indication (see subselect_single_select_engine::exec()).
+      In other words 'executed' flag is used for two purposes, for
+      error indication at JOIN::optimize() stage and for an
+      indication of subquery execution. And it seems it's wrong
+      as the flag could be reset.
+    ------------------------------------------------------------
+    revno: 3560.6.40
+    committer: Marko M?kel? <marko.makela@oracle.com>
+    branch nick: mysql-5.1
+    timestamp: Tue 2011-10-04 21:01:40 +0300
+    message:
+      Correct the ChangeLog
+    ------------------------------------------------------------
+    revno: 3560.6.39 [merge]
+    committer: kevin.lewis@oracle.com
+    branch nick: mysql-5.1
+    timestamp: Tue 2011-10-04 10:46:54 -0500
+    message:
+      Merge to current mysql-5.1
+        ------------------------------------------------------------
+        revno: 3560.13.1 [merge]
+        committer: Joerg Bruehe <joerg.bruehe@oracle.com>
+        branch nick: mysql-5.1
+        timestamp: Tue 2011-10-04 17:16:32 +0200
+        message:
+          Merge to main.
+            ------------------------------------------------------------
+            revno: 3560.12.1
+            committer: Joerg Bruehe <joerg.bruehe@oracle.com>
+            branch nick: bug11886309-5.1
+            timestamp: Tue 2011-10-04 15:58:19 +0200
+            message:
+              Fix bug#11886309: RPM UPGRADE OF MYSQL ADVANCED GPL TO MYSQL SERVER ADVANCED DOES NOT WORK
+              
+              Change the RPM spec file so that each RPM "obsoletes" the corresponding RPMs
+              of all (other) configurations, so a "server" RPM of any configuration
+              can replace the "server" RPM of any other configuration on a "rpm -U".
+    ------------------------------------------------------------
+    revno: 3560.6.38
+    committer: kevin.lewis@oracle.com
+    branch nick: mysql-5.1
+    timestamp: Tue 2011-10-04 09:21:47 -0500
+    message:
+      Bug#12980094 and Bug#13034534
+      
+      Bug 12980094 - ASSERTION IN INNODB DETECTED IN RQG_PARTITION_DDL
+      Bug 13034534 - RQG TESTS FAIL ON WINDOWS WITH CRASH NEAR RW_LOCK_DEBUG_PRINT
+      
+      All access to struct rw_lock_debug_struct must be protected by rw_lock_debug_mutex_enter().
+    ------------------------------------------------------------
+    revno: 3560.6.37
+    committer: Raghav Kapoor <raghav.kapoor@oracle.com>
+    branch nick: mysql-5.1-bug-11758062
+    timestamp: Wed 2011-09-28 15:39:21 +0530
+    message:
+      BUG#11758062 - 50206: ER_TOO_BIG_SELECT REFERS TO OUTMODED 
+      SYSTEM VARIABLE NAME SQL_MAX_JOIN_SI 
+      
+      BACKGROUND:
+      
+      ER_TOO_BIG_SELECT refers to SQL_MAX_JOIN_SIZE, which is the
+      old name for MAX_JOIN_SIZE.
+      
+      FIX:
+      
+      Support for old name SQL_MAX_JOIN_SIZE is removed in MySQL 5.6
+      and is renamed as MAX_JOIN_SIZE.So the errmsg.txt 
+      and mysql.cc files have been updated and the corresponding result
+      files have also been updated.
+    ------------------------------------------------------------
+    revno: 3560.6.36
+    committer: Ashish Agarwal<ashish.y.agarwal@oracle.com>
+    branch nick: mysql-5.1
+    timestamp: Tue 2011-09-27 17:38:51 +0530
+    message:
+      BUG#11759349 - 51655: CREATE TABLE IN MEMORY ENGINE DOESN'T STORE
+                            CREATE_TIME IN INFORMATION_SC
+      
+      It was impossible to determine MEMORY table creation time,
+      since it wasn't stored/exposed.
+      
+      With this patch creation time is saved and it is available via
+      I_S.TABLES.CREATE_TIME.
+      
+      Note: it was decided that additional analysis is required before
+      implementing UPDATE_TIME. Thus this patch doesn't store UPDATE_TIME.
+    ------------------------------------------------------------
+    revno: 3560.6.35 [merge]
+    committer: Bjorn Munch <bjorn.munch@oracle.com>
+    branch nick: push-51
+    timestamp: Mon 2011-09-26 12:26:16 +0200
+    message:
+      merge from 5.1-mtr
+        ------------------------------------------------------------
+        revno: 2728.17.249 [merge]
+        committer: Bjorn Munch <bjorn.munch@oracle.com>
+        branch nick: merge-51
+        timestamp: Mon 2011-09-26 10:06:25 +0200
+        message:
+          merge from 5.1 main
+        ------------------------------------------------------------
+        revno: 2728.17.248 [merge]
+        committer: Bjorn Munch <bjorn.munch@oracle.com>
+        branch nick: merge-51
+        timestamp: Tue 2011-09-20 12:12:46 +0200
+        message:
+          merge from 5.1 main minus merge jam pushes
+        ------------------------------------------------------------
+        revno: 2728.17.247
+        committer: Bjorn Munch <bjorn.munch@oracle.com>
+        branch nick: cutlog-51
+        timestamp: Mon 2011-09-19 16:06:35 +0200
+        message:
+          Bug #12916194 MTR SHOULD CUT OFF ANALYSIS OF SERVER LOG IF THERE IS TOO MUCH
+            Added simple cut-off w/warning if > one million lines
+        ------------------------------------------------------------
+        revno: 2728.17.246
+        committer: Bjorn Munch <bjorn.munch@oracle.com>
+        branch nick: errcomm-51
+        timestamp: Thu 2011-09-15 12:20:43 +0200
+        message:
+          Test federated_plugin must have ps-protocol off
+        ------------------------------------------------------------
+        revno: 2728.17.245
+        committer: Bjorn Munch <bjorn.munch@oracle.com>
+        branch nick: errcomm-51
+        timestamp: Wed 2011-09-14 15:26:53 +0200
+        message:
+          Bug #12912120 MTR SHOULD EXPORT MYSQLD'S PATH TO TEST CASES
+            Export $MYSQLD as full path to executable
+            $MYSQLD_CMD is executable with minimum required args
+        ------------------------------------------------------------
+        revno: 2728.17.244
+        committer: Bjorn Munch <bjorn.munch@oracle.com>
+        branch nick: errcomm-51
+        timestamp: Wed 2011-09-14 15:19:24 +0200
+        message:
+          Bug #12793118 MYSQLTEST: --ERROR AND --DISABLE_ABORT_ON_ERROR DO NOT WORK FOR SQL IN COMMANDS
+            Call handle_error() instead of die() when evaluating these
+            Must remember "current command" with link to errors to ignore
+            Added test cases to mysqltest.test 
+        ------------------------------------------------------------
+        revno: 2728.17.243
+        committer: Bjorn Munch <bjorn.munch@oracle.com>
+        branch nick: fedplug-51
+        timestamp: Mon 2011-09-05 14:38:20 +0200
+        message:
+          Bug #11750417 40942: UNABLE TO INSTALL FEDERATED PLUGIN
+            Link plugin with a copy of string.o
+            Copied test from 5.5 but this was dysfunctional, made it work
+            Also tested on Windows
+    ------------------------------------------------------------
+    revno: 3560.6.34
+    committer: Marko M?kel? <marko.makela@oracle.com>
+    branch nick: mysql-5.1
+    timestamp: Thu 2011-09-22 13:35:02 +0300
+    message:
+      Bug#12963823 CRASH IN PURGE THREAD UNDER UNUSUAL CIRCUMSTANCES
+      
+      Replace part of the patch that Kevin apparently forgot to push.
+      Fix the bug also in the built-in InnoDB of MySQL 5.1.
+      
+      I cannot explain why the test case was not failing without the
+      full patch.
+      
+      This was rb:762, approved by me.
+    ------------------------------------------------------------
+    revno: 3560.6.33
+    committer: kevin.lewis@oracle.com
+    branch nick: mysql-5.1
+    timestamp: Tue 2011-09-20 18:12:36 -0600
+    message:
+      Bug 12963823 - Crash in Purge thread under unusual circumstances.
+      The problem occurred when indexes are added between the time that an
+      UNDO record is created and the time that the purge thread comes around
+      and deletes the old secondary index entries.  The purge thread would
+      hit an assert when trying to build a secondary index entry for
+      searching.  The problem was that the old value of those fields were not
+      in the UNDO record since they were not part of an index when the UPDATE
+      occured. 
+      A test case was added to innodb-index.test.
+    ------------------------------------------------------------
+    revno: 3560.6.32 [merge]
+    committer: Sergey Vojtovich <sergey.vojtovich@oracle.com>
+    branch nick: mysql-5.1-push
+    timestamp: Fri 2011-09-16 16:03:08 +0400
+    message:
+      Merge.
+        ------------------------------------------------------------
+        revno: 3560.11.1
+        committer: Sergey Vojtovich <sergey.vojtovich@oracle.com>
+        branch nick: mysql-5.1-bug53646
+        timestamp: Fri 2011-09-16 15:30:31 +0400
+        message:
+          BUG#11761180 - 53646: MYISAMPACK CORRUPTS TABLES WITH
+                         FULLTEXT INDEXES
+          
+          myisamchk may create incorrect fulltext index for compressed
+          tables. Incorrect data pointer size was used while creating
+          fulltext index.
+    ------------------------------------------------------------
+    revno: 3560.6.31 [merge]
+    author: karen.langford@oracle.com
+    committer: Karen Langford <karen.langford@oracle.com>
+    branch nick: mysql-5.1
+    timestamp: Thu 2011-09-15 18:48:54 +0200
+    message:
+      Merge from mysql-5.1.59-release
+    ------------------------------------------------------------
+    revno: 3560.6.30
+    committer: Marko M?kel? <marko.makela@oracle.com>
+    branch nick: mysql-5.1
+    timestamp: Wed 2011-09-14 15:39:36 +0300
+    message:
+      Hopefully really final fix of Bug#11766591 59733: Possible deadlock
+      when buffered changes are to be discarded
+      
+      sync_thread_add_level(level = SYNC_IBUF_INDEX_TREE): Relax a too strict
+      condition that the thread must not be holding locks below SYNC_FSP_PAGE.
+      It is perfectly valid to hold any latch above SYNC_IBUF_INDEX_TREE when
+      acquiring the insert buffer tree latch.
+    ------------------------------------------------------------
+    revno: 3560.6.29
+    committer: Vasil Dimov <vasil.dimov@oracle.com>
+    branch nick: mysql-5.1
+    timestamp: Tue 2011-09-13 17:18:06 +0300
+    message:
+      Re-enable the prefetch code in InnoDB internal SQL parser and fix two
+      bugs in it - accessing uninitialized ::len member (thanks, Jimmy!)
+      and a memory leak.
+      
+      This is a followup to vasil.dimov@oracle.com-20110909070724-jvirxnpkbxieauz5
+      which disabled the prefetch code.
+    ------------------------------------------------------------
+    revno: 3560.6.28
+    committer: Marko M?kel? <marko.makela@oracle.com>
+    branch nick: mysql-5.1
+    timestamp: Tue 2011-09-13 09:18:34 +0300
+    message:
+      Hopefully final fix of Bug#11766591 59733: Possible deadlock
+      when buffered changes are to be discarded
+      
+      ibuf_add_free_page(): Lower the latching order of the newly allocated page
+      to SYNC_IBUF_TREE_NODE_NEW after latching the insert buffer tree root.
+      
+      This bug always was bogus UNIV_SYNC_DEBUG alarm. The function
+      buf_block_dbg_add_level() is a no-op unless UNIV_SYNC_DEBUG is defined.
+    ------------------------------------------------------------
+    revno: 3560.6.27
+    committer: Marko M?kel? <marko.makela@oracle.com>
+    branch nick: mysql-5.1
+    timestamp: Mon 2011-09-12 10:12:15 +0300
+    message:
+      Bug#12601439 CONSISTENT READ FAILURE IN COLUMN PREFIX INDEX
+      
+      When there is a secondary index on a column prefix of an externally
+      stored column and an entry in the secondary index is shorter than the
+      reserved prefix length, it should mean that the secondary index entry
+      is holding the complete column value. When comparing this secondary
+      index column value to the column in the clustered index row, we must
+      compare the entire prefix that was fetched from the clustered
+      index. The bug was that we would just compare that the column in the
+      clustered index starts with the value found in the secondary index
+      column.
+      
+      This bug affects only the InnoDB Barracuda formats (ROW_FORMAT=DYNAMIC
+      and ROW_FORMAT=COMPRESSED), in which columns that are stored off-page
+      in the clustered index do not contain any prefix in the clustered
+      index record.
+      
+      row_sel_sec_rec_is_for_blob(): Add the parameter prefix_len, for
+      ifield->prefix_len. Add some assertions.
+      
+      Sorry, I did not manage to produce a test case. This patch does
+      produce correct results on the data set that Michael isolated on our
+      test machine. That was with the purge and background rollback
+      suspended, because they would make the bug go away.
+      
+      rb:760 approved by Sunny Bains
+    ------------------------------------------------------------
+    revno: 3560.6.26
+    committer: Vasil Dimov <vasil.dimov@oracle.com>
+    branch nick: mysql-5.1
+    timestamp: Fri 2011-09-09 10:07:24 +0300
+    message:
+      Disable the prefetch code in the InnoDB internal SQL parser.
+      
+      This change is a followup to
+      vasil.dimov@oracle.com-20110907145810-v98kldmho23vhhic
+      which triggered the usage of the prefetch and valgrind tests spat lots of
+      warnings.
+      
+      The prefetch code will be removed.
+      
+      Discussed with:	Marko (over IM)
+    ------------------------------------------------------------
+    revno: 3560.6.25
+    committer: Marko M?kel? <marko.makela@oracle.com>
+    branch nick: mysql-5.1
+    timestamp: Thu 2011-09-08 16:10:24 +0300
+    message:
+      Bug#12948130 UNNECESSARY X-LOCKING OF ADAPTIVE HASH INDEX (BTR_SEARCH_LATCH)
+      
+      InnoDB acquires an x-latch on btr_search_latch for certain in-place updates
+      that do affect the adaptive hash index. These operations do not really need
+      to be protected by the btr_search_latch:
+      
+      * updating DB_TRX_ID
+      * updating DB_ROLL_PTR
+      * updating PAGE_MAX_TRX_ID
+      * updating the delete-mark flag
+      
+      rb:750 approved by Sunny Bains
+    ------------------------------------------------------------
+    revno: 3560.6.24
+    committer: Marko M?kel? <marko.makela@oracle.com>
+    branch nick: mysql-5.1
+    timestamp: Thu 2011-09-08 15:54:15 +0300
+    message:
+      Bug#11766591 59733: POSSIBLE DEADLOCK WHEN BUFFERED CHANGES ARE DISCARDED
+      
+      Tweak the faulty UNIV_SYNC_DEBUG diagnostics a little bit more.
+      
+      ibuf_add_free_page(): Lower the latching order of the newly allocated page
+      only after acquiring the ibuf_mutex.
+    ------------------------------------------------------------
+    revno: 3560.6.23
+    committer: Vasil Dimov <vasil.dimov@oracle.com>
+    branch nick: mysql-5.1
+    timestamp: Wed 2011-09-07 17:58:10 +0300
+    message:
+      Use cursors for seeking records in SYS_FOREIGN and SYS_INDEXES from
+      DROP_TABLE_PROC().
+      
+      With this change I observe a speedup from 6.2s to 0.1s when executing
+      DROP_TABLE_PROC() during DROP TABLE with 512 foreign keys, like what
+      is being done in innodb_bug56143.test
+      
+      This fixes "Bug#11765460 DROP TABLE USES INEFFICIENT METHODS TO REMOVE
+      FKS/INDEXES FROM INNODB SYS TABLES"
+      
+      Reviewed by:	Marko
+    ------------------------------------------------------------
+    revno: 3560.6.22
+    committer: Nirbhay Choubey <nirbhay.choubey@oracle.com>
+    branch nick: mysql-5.1
+    timestamp: Tue 2011-09-06 21:50:04 +0530
+    message:
+      Bug#11765888 58898: MYSQL_INSTALL_DB: NOT ALL OPTIONS DOCUMENTED
+                                  (EG: --DEFAULTS-FILE )
+        
+      Updating help message in scripts/mysql_install_db.pl.in file.
+    ------------------------------------------------------------
+    revno: 3560.6.21
+    committer: Nirbhay Choubey <nirbhay.choubey@oracle.com>
+    branch nick: mysql-5.1
+    timestamp: Tue 2011-09-06 21:25:28 +0530
+    message:
+      Removing a stray line, went into the last push.
+    ------------------------------------------------------------
+    revno: 3560.6.20
+    committer: Nirbhay Choubey <nirbhay.choubey@oracle.com>
+    branch nick: B11765888-5.1
+    timestamp: Tue 2011-09-06 21:06:09 +0530
+    message:
+      Bug#11765888 58898: MYSQL_INSTALL_DB: NOT ALL OPTIONS DOCUMENTED
+                          (EG: --DEFAULTS-FILE )
+      
+      Added help message for the missing options (--no-defaults,
+      --defaults-file and --defaults-extra-file).
+    ------------------------------------------------------------
+    revno: 3560.6.19
+    committer: Marko M?kel? <marko.makela@oracle.com>
+    branch nick: mysql-5.1
+    timestamp: Tue 2011-09-06 10:08:52 +0300
+    message:
+      Bug #12950803 62294: BUF_BUDDY_RELOCATE CALLS GETTIMEOFDAY ...
+      
+      buf_buddy_relocate(): The ut_time_us() function is needed for
+      statistics, calculating the total time spent on relocating blocks.
+      Until now, we invoked ut_time_us() every time buf_buddy_relocate() was
+      called. Fix: Only call ut_time_us() when the block can be relocated.
+      After this fix, the reported relocated_usec will no longer include the
+      time for the page_hash lookup and for acquiring the block mutex.
+      
+      Approved by Sunny Bains on IM
+    ------------------------------------------------------------
+    revno: 3560.6.18
+    committer: Marko M?kel? <marko.makela@oracle.com>
+    branch nick: mysql-5.1
+    timestamp: Tue 2011-09-06 10:04:21 +0300
+    message:
+      Bug#12547647 UPDATE LOGGING COULD EXCEED LOG PAGE SIZE - take 2
+      
+      The original fix was accidentally pushed to mysql-5.1 after the 5.1.59
+      clone-off in bzr revision id
+      marko.makela@oracle.com-20110829081642-z0w992a0mrc62s6w with thne fix
+      of Bug#12704861 Corruption after a crash during BLOB update.
+      It was pushed separately to mysql-5.5 in bzr revision id
+      marko.makela@oracle.com-20110901184804-2901f6qmuro3jas8.
+      
+      trx_undo_report_row_operation(): If the page for which the undo log
+      was too big was empty, commit and start the mini-transaction before
+      acquiring the rollback segment mutex and freeing the undo page. This
+      is necessary, because the mini-transaction may be holding lower-order
+      latches in the levels SYNC_FSP and SYNC_FSP_PAGE.
+      
+      trx_undo_erase_page_end(): Erase also empty pages, because
+      trx_undo_report_row_operation() needs to commit the mini-transaction
+      before freeing the empty page.
+      
+      rb:756 approved by Sunny Bains
+    ------------------------------------------------------------
+    revno: 3560.6.17 [merge]
+    committer: Bjorn Munch <bjorn.munch@oracle.com>
+    branch nick: merge-51
+    timestamp: Tue 2011-08-30 22:34:14 +0200
+    message:
+      merge from 5.1-mtr
+        ------------------------------------------------------------
+        revno: 2728.17.242 [merge]
+        committer: Bjorn Munch <bjorn.munch@oracle.com>
+        branch nick: merge-51
+        timestamp: Tue 2011-08-30 11:33:19 +0200
+        message:
+          new merge from 5.1
+        ------------------------------------------------------------
+        revno: 2728.17.241 [merge]
+        committer: Bjorn Munch <bjorn.munch@oracle.com>
+        branch nick: merge-51
+        timestamp: Mon 2011-08-29 22:47:08 +0200
+        message:
+          merge from 5.1 main
+        ------------------------------------------------------------
+        revno: 2728.17.240 [merge]
+        committer: Bjorn Munch <bjorn.munch@oracle.com>
+        branch nick: forcer-51
+        timestamp: Mon 2011-08-22 13:36:31 +0200
+        message:
+          merge from 5.1 main
+        ------------------------------------------------------------
+        revno: 2728.17.239
+        committer: Bjorn Munch <bjorn.munch@oracle.com>
+        branch nick: forcer-51
+        timestamp: Wed 2011-08-17 14:42:18 +0200
+        message:
+          Bug #11766654 59811: RE-INSTATE PROCEDURE MTR.FORCE_RESTART IN MTR, REMOVED BY 49978
+          
+          Just put it back in where it was.
+        ------------------------------------------------------------
+        revno: 2728.17.238
+        committer: Bjorn Munch <bjorn.munch@oracle.com>
+        branch nick: disab-51
+        timestamp: Thu 2011-07-28 13:01:51 +0200
+        message:
+          Fixed test ndb.ndb_partition_error2, didn't include have_ndb.inc
+        ------------------------------------------------------------
+        revno: 2728.17.237
+        committer: Bjorn Munch <bjorn.munch@oracle.com>
+        branch nick: disab-51
+        timestamp: Thu 2011-07-28 12:54:02 +0200
+        message:
+          Bug #12726039 MTR SHOULD PROVIDE ABILITY TO DISABLE TEST ON SELECTED PLATFORMS
+            Add extra patterns to look for @<platform>
+        ------------------------------------------------------------
+        revno: 2728.17.236 [merge]
+        committer: Bjorn Munch <bjorn.munch@oracle.com>
+        branch nick: merge-51
+        timestamp: Fri 2011-07-22 10:21:39 +0200
+        message:
+          merge from 5.1 main
+    ------------------------------------------------------------
+    revno: 3560.6.16 [merge]
+    committer: Tor Didriksen <tor.didriksen@oracle.com>
+    branch nick: 5.1
+    timestamp: Tue 2011-08-30 11:10:01 +0200
+    message:
+      local merge
+        ------------------------------------------------------------
+        revno: 3560.10.1
+        committer: Norvald H. Ryeng <norvald.ryeng@oracle.com>
+        branch nick: mysql-5.1-11765254
+        timestamp: Tue 2011-08-30 09:56:07 +0200
+        message:
+          Bug#11765254 - 58200: ASSERTION FAILED: PARAM.SORT_LENGTH WHEN
+          GROUPING BY FUNCTIONS.... (PART
+          
+          The bug was introduced in a patch for bug 49897.
+          
+          Problem: The assertion inserted by the original patch to guard against
+          zero-lenght sort keys during merge phase triggers also when the whole
+          set fits in memory.
+          
+          Fix: Move assert so that it does not trigger if the whole set is in
+          memory.
+    ------------------------------------------------------------
+    revno: 3560.6.15
+    committer: Tor Didriksen <tor.didriksen@oracle.com>
+    branch nick: 5.1
+    timestamp: Tue 2011-08-30 10:19:36 +0200
+    message:
+      Bug#12856915 VALGRIND FAILURE IN FILESORT/CREATE_SORT_INDEX
+      
+      Post-push fix:
+      The functions write_keys() and find_all_keys() may have a slightly
+      different function signature, depending on compiler/platform/flags.
+    ------------------------------------------------------------
+    revno: 3560.6.14
+    committer: Tor Didriksen <tor.didriksen@oracle.com>
+    branch nick: 5.1
+    timestamp: Mon 2011-08-29 11:24:36 +0200
+    message:
+      BUG#12911710 - VALGRIND FAILURE IN ROW-DEBUG:PERFSCHEMA.SOCKET_SUMMARY_BY_INSTANCE_FUNC 
+      
+      Converting the number zero to binary and back yielded the number zero,
+      but with no digits, i.e. zero precision.
+      This made the multiply algorithm go haywire in various ways.
+    ------------------------------------------------------------
+    revno: 3560.6.13 [merge]
+    committer: Tor Didriksen <tor.didriksen@oracle.com>
+    branch nick: 5.1-bug12856915-valgrind
+    timestamp: Mon 2011-08-29 11:17:33 +0200
+    message:
+      local merge
+        ------------------------------------------------------------
+        revno: 3560.9.1
+        committer: Marko M?kel? <marko.makela@oracle.com>
+        branch nick: mysql-5.1
+        timestamp: Mon 2011-08-29 11:16:42 +0300
+        message:
+          Bug#12704861 Corruption after a crash during BLOB update
+          
+          The fix of Bug#12612184 broke crash recovery. When a record that
+          contains off-page columns (BLOBs) is updated, we must first write redo
+          log about the BLOB page writes, and only after that write the redo log
+          about the B-tree changes. The buggy fix would log the B-tree changes
+          first, meaning that after recovery, we could end up having a record
+          that contains a null BLOB pointer.
+          
+          Because we will be redo logging the writes off the off-page columns
+          before the B-tree changes, we must make sure that the pages chosen for
+          the off-page columns are free both before and after the B-tree
+          changes. In this way, the worst thing that can happen in crash
+          recovery is that the BLOBs are written to free pages, but the B-tree
+          changes are not applied. The BLOB pages would correctly remain free in
+          this case. To achieve this, we must allocate the BLOB pages in the
+          mini-transaction of the B-tree operation. A further quirk is that BLOB
+          pages are allocated from the same file segment as leaf pages. Because
+          of this, we must temporarily "hide" any leaf pages that were freed
+          during the B-tree operation by "fake allocating" them prior to writing
+          the BLOBs, and freeing them again before the mtr_commit() of the
+          B-tree operation, in btr_mark_freed_leaves().
+          
+          btr_cur_mtr_commit_and_start(): Remove this faulty function that was
+          introduced in the Bug#12612184 fix. The problem that this function was
+          trying to address was that when we did mtr_commit() the BLOB writes
+          before the mtr_commit() of the update, the new BLOB pages could have
+          overwritten clustered index B-tree leaf pages that were freed during
+          the update. If recovery applied the redo log of the BLOB writes but
+          did not see the log of the record update, the index tree would be
+          corrupted. The correct solution is to make the freed clustered index
+          pages unavailable to the BLOB allocation. This function is also a
+          likely culprit of InnoDB hangs that were observed when testing the
+          Bug#12612184 fix.
+          
+          btr_mark_freed_leaves(): Mark all freed clustered index leaf pages of
+          a mini-transaction allocated (nonfree=TRUE) before storing the BLOBs,
+          or freed (nonfree=FALSE) before committing the mini-transaction.
+          
+          btr_freed_leaves_validate(): A debug function for checking that all
+          clustered index leaf pages that have been marked free in the
+          mini-transaction are consistent (have not been zeroed out).
+          
+          btr_page_alloc_low(): Refactored from btr_page_alloc(). Return the
+          number of the allocated page, or FIL_NULL if out of space. Add the
+          parameter "mtr_t* init_mtr" for specifying the mini-transaction where
+          the page should be initialized, or if this is a "fake allocation"
+          (init_mtr=NULL) by btr_mark_freed_leaves(nonfree=TRUE).
+          
+          btr_page_alloc(): Add the parameter init_mtr, allowing the page to be
+          initialized and X-latched in a different mini-transaction than the one
+          that is used for the allocation. Invoke btr_page_alloc_low(). If a
+          clustered index leaf page was previously freed in mtr, remove it from
+          the memo of previously freed pages.
+          
+          btr_page_free(): Assert that the page is a B-tree page and it has been
+          X-latched by the mini-transaction. If the freed page was a leaf page
+          of a clustered index, link it by a MTR_MEMO_FREE_CLUST_LEAF marker to
+          the mini-transaction.
+          
+          btr_store_big_rec_extern_fields_func(): Add the parameter alloc_mtr,
+          which is NULL (old behaviour in inserts) and the same as local_mtr in
+          updates. If alloc_mtr!=NULL, the BLOB pages will be allocated from it
+          instead of the mini-transaction that is used for writing the BLOBs.
+          
+          fsp_alloc_from_free_frag(): Refactored from
+          fsp_alloc_free_page(). Allocate the specified page from a partially
+          free extent.
+          
+          fseg_alloc_free_page_low(), fseg_alloc_free_page_general(): Add the
+          parameter "mtr_t* init_mtr" for specifying the mini-transaction where
+          the page should be initialized, or NULL if this is a "fake allocation"
+          that prevents the reuse of a previously freed B-tree page for BLOB
+          storage. If init_mtr==NULL, try harder to reallocate the specified page
+          and assert that it succeeded.
+          
+          fsp_alloc_free_page(): Add the parameter "mtr_t* init_mtr" for
+          specifying the mini-transaction where the page should be initialized.
+          Do not allow init_mtr == NULL, because this function is never to be
+          used for "fake allocations".
+          
+          mtr_t: Add the operation MTR_MEMO_FREE_CLUST_LEAF and the flag
+          mtr->freed_clust_leaf for quickly determining if any
+          MTR_MEMO_FREE_CLUST_LEAF operations have been posted.
+          
+          row_ins_index_entry_low(): When columns are being made off-page in
+          insert-by-update, invoke btr_mark_freed_leaves(nonfree=TRUE) and pass
+          the mini-transaction as the alloc_mtr to
+          btr_store_big_rec_extern_fields(). Finally, invoke
+          btr_mark_freed_leaves(nonfree=FALSE) to avoid leaking pages.
+          
+          row_build(): Correct a comment, and add a debug assertion that a
+          record that contains NULL BLOB pointers must be a fresh insert.
+          
+          row_upd_clust_rec(): When columns are being moved off-page, invoke
+          btr_mark_freed_leaves(nonfree=TRUE) and pass the mini-transaction as
+          the alloc_mtr to btr_store_big_rec_extern_fields(). Finally, invoke
+          btr_mark_freed_leaves(nonfree=FALSE) to avoid leaking pages.
+          
+          buf_reset_check_index_page_at_flush(): Remove. The function
+          fsp_init_file_page_low() already sets
+          bpage->check_index_page_at_flush=FALSE.
+          
+          There is a known issue in tablespace extension. If the request to
+          allocate a BLOB page leads to the tablespace being extended, crash
+          recovery could see BLOB writes to pages that are off the tablespace
+          file bounds. This should trigger an assertion failure in fil_io() at
+          crash recovery. The safe thing would be to write redo log about the
+          tablespace extension to the mini-transaction of the BLOB write, not to
+          the mini-transaction of the record update. However, there is no redo
+          log record for file extension in the current redo log format.
+          
+          rb:693 approved by Sunny Bains
+    ------------------------------------------------------------
+    revno: 3560.6.12
+    committer: Tor Didriksen <tor.didriksen@oracle.com>
+    branch nick: 5.1-bug12856915-valgrind
+    timestamp: Thu 2011-08-25 10:38:07 +0200
+    message:
+      Bug#12856915 VALGRIND FAILURE IN FILESORT/CREATE_SORT_INDEX
+      
+      Suppress the known warnings generated by filesort().
+      
+      The real fix belongs to worklog 1509:
+      Pack values of non-sorted fields in the sort buffer
+      (which is basically the same issue, but in an optimization context:
+       We are writing the entire sort buffer to disk, 
+       including un-used space for varchar columns.)
+    ------------------------------------------------------------
+    revno: 3560.6.11
+    committer: Rohit Kalhans<rohit.kalhans@oracle.com>
+    branch nick: mysql-5.1_b11878104
+    timestamp: Fri 2011-08-26 15:27:29 +0530
+    message:
+      BUG#11878104: FIXES OF BUG 11752963 - 44312 TO BACKPORT TO MYSQL-5.1
+      Background: Backporting fix for BUG 11752963 to Mysql5.1 branch.
+      Problem: Fix of bug 11752963 was only available for trunk and 5.5 branch.
+      Partial fix has been pushed to 5.1 branch as well. 
+      Fix: backporting the fixes of bug 11752963 to 5.1 branch. 
+      1. Made all major changes to make 5.1 branch in line with 5.5 and the trunk.
+      2. skipped the partial patch that was already applied to the 5.1 branch. 
+    ------------------------------------------------------------
+    revno: 3560.6.10 [merge]
+    committer: Sergey Vojtovich <sergey.vojtovich@oracle.com>
+    branch nick: mysql-5.1-push
+    timestamp: Wed 2011-08-24 11:18:00 +0400
+    message:
+      Merge.
+        ------------------------------------------------------------
+        revno: 3452.77.1
+        committer: Sergey Vojtovich <sergey.vojtovich@oracle.com>
+        branch nick: mysql-5.1-bug56458
+        timestamp: Thu 2011-08-18 10:38:51 +0400
+        message:
+          BUG#11763712 - 56458: KILLING A FLUSH TABLE FOR A MERGE/CHILD
+                                CRASHES SERVER
+          
+          Flushing of MERGE table or one of its child tables, which was
+          locked by flushing thread using LOCK TABLES, might have caused
+          crashes or assertion failures if the thread failed to reopen
+          child or parent table.
+          Particularly, this might have happened when another connection
+          killed this FLUSH TABLE statement/connection.
+          Also this problem might have occurred when we failed to reopen
+          MERGE table or one of its children when executing DDL statement
+          under LOCK TABLES.
+          
+          The problem was caused by the fact that reopen_tables() might
+          have failed to reopen child table but still tried to reopen,
+          reattach children for and re-lock its parent. Vice versa it
+          might have failed to reopen parent but kept references from
+          children to parent around. Since reopen_tables() closes table
+          it has failed to reopen and therefore frees all associated
+          memory such dangling references led to crashes when followed.
+          
+          This patch solves this problem by ensuring that we always close
+          parent table and all its children if we fail to reopen this
+          table or one of its children. Same happens if we fail to reattach
+          children to parent.
+          
+          Affects 5.1 only.
+    ------------------------------------------------------------
+    revno: 3560.6.9
+    committer: Marko M?kel? <marko.makela@oracle.com>
+    branch nick: mysql-5.1
+    timestamp: Mon 2011-08-22 17:03:07 +0300
+    message:
+      Bug #11766591  59733: POSSIBLE DEADLOCK WHEN BUFFERED CHANGES ARE TO BE DISCARDED
+      
+      The fix in revision id marko.makela@oracle.com-20110815091143-h3zbvm0pv8ni3qql
+      introduced a false UNIV_SYNC_DEBUG alarm. Relax the assertion.
+    ------------------------------------------------------------
+    revno: 3560.6.8 [merge]
+    committer: Joerg Bruehe <joerg.bruehe@oracle.com>
+    branch nick: mysql-5.1
+    timestamp: Fri 2011-08-19 19:35:58 +0200
+    message:
+      Merge bug fix to main.
+        ------------------------------------------------------------
+        revno: 3560.8.1
+        committer: Joerg Bruehe <joerg.bruehe@oracle.com>
+        branch nick: bug37165-2-5.1
+        timestamp: Fri 2011-08-19 18:48:14 +0200
+        message:
+          Fix bug#37165 "((Generic rpm)) fail to install on Fedora 9 x86_64"
+          
+          On Fedora, certain accesses to "/var/lib/mysql/HOSTNAME.err" were blocked
+          by SELinux policy, this made the server start fail with the message
+              Manager of pid-file quit without updating file
+          Calling "/sbin/restorecon -R /var/lib/mysql" fixes this.
+    ------------------------------------------------------------
+    revno: 3560.6.7
+    author: hery.ramilison@oracle.com
+    committer: Hery Ramilison <hery.ramilison@oracle.com>
+    branch nick: mysql-5.1
+    timestamp: Wed 2011-08-17 00:34:11 +0200
+    message:
+      2nd fix for Bug #55713  innochecksum is NOT built with large file support enabled
+    ------------------------------------------------------------
+    revno: 3560.6.6
+    author: hery.ramilison@oracle.com
+    committer: Hery Ramilison <hery.ramilison@oracle.com>
+    branch nick: mysql-5.1
+    timestamp: Tue 2011-08-16 19:29:06 +0200
+    message:
+      fix for bug 55713   innochecksum is NOT built with large file support enabled
+    ------------------------------------------------------------
+    revno: 3560.6.5 [merge]
+    committer: Joerg Bruehe <joerg.bruehe@oracle.com>
+    branch nick: mysql-5.1
+    timestamp: Mon 2011-08-15 20:41:17 +0200
+    message:
+      Merge bug#47337 for pushing into 5.1
+        ------------------------------------------------------------
+        revno: 3560.7.1
+        committer: Joerg Bruehe <joerg.bruehe@oracle.com>
+        branch nick: bug47337-5.1
+        timestamp: Fri 2011-07-08 16:25:32 +0200
+        message:
+          Fix Bug #47337:
+          innochecksum not built for --with-plugin-innodb_plugin --without-plugin-innobase
+          
+          In 5.1, we can have the traditional "innobase" code
+          (built-in) or the new version "innodb" (plugin).
+          The help tool "innochecksum" is useful for both,
+          but its generation was coupled to "innobase" only.
+          
+          Fix this by treating both "innobase" and "innodb"
+          equivalent in the configure phase,
+          this affects both "innochecksum" and the InnoDB documentation.
+          
+          This patch was proposed by Mark Callaghan.
+    ------------------------------------------------------------
+    revno: 3560.6.4
+    committer: Marko M?kel? <marko.makela@oracle.com>
+    branch nick: mysql-5.1
+    timestamp: Mon 2011-08-15 12:11:43 +0300
+    message:
+      Bug #11766591 59733: Possible deadlock when buffered changes are to be
+      discarded in buf_page_create()
+      
+      This bug turned out to be a false alarm, a bug in the UNIV_SYNC_DEBUG
+      diagnostic code. Because of this, the patch was not backported to the
+      built-in InnoDB in MySQL 5.1. Furthermore, there is no test case for
+      InnoDB Plugin in MySQL 5.1, because the delete buffering in MySQL 5.5
+      makes triggering the failure much easier.
+      
+      When a freed page for which there exist orphaned buffered changes is
+      allocated and reused for something else, buf_page_create() will discard
+      the buffered changes by invoking ibuf_merge_or_delete_for_page().
+      This would violate the InnoDB latching order.
+      
+      Tweak the latching order as follows. Move SYNC_IBUF_MUTEX below
+      SYNC_FSP_PAGE, where it logically belongs, and assign new latching
+      levels for the ibuf->index->lock and the insert buffer B-tree pages:
+      
+      #define SYNC_IBUF_MUTEX		370	/* ibuf_mutex */
+      #define SYNC_IBUF_INDEX_TREE	360
+      #define SYNC_IBUF_TREE_NODE_NEW	359
+      #define SYNC_IBUF_TREE_NODE	358
+      
+      btr_block_get(), btr_page_get(): In UNIV_SYNC_DEBUG, add the parameter
+      "index" for determining the appropriate latching order
+      (SYNC_IBUF_TREE_NODE or SYNC_TREE_NODE).
+      
+      btr_page_alloc_for_ibuf(), btr_create(): Use SYNC_IBUF_TREE_NODE_NEW
+      instead of SYNC_TREE_NODE_NEW for insert buffer pages.
+      
+      btr_cur_search_to_nth_level(), btr_pcur_restore_position_func(): Use
+      SYNC_IBUF_TREE_NODE instead of SYNC_TREE_NODE for insert buffer pages.
+      
+      btr_search_guess_on_hash(): Assert that the index is not an insert buffer tree.
+      
+      dict_index_add_to_cache(): Use SYNC_IBUF_INDEX_TREE for the insert
+      buffer tree (ibuf->index->lock).
+      
+      ibuf0ibuf.c: Use SYNC_IBUF_TREE_NODE or SYNC_IBUF_TREE_NODE_NEW for
+      all B-tree pages.
+      
+      ibuf_merge_or_delete_for_page(): Assert that the user page is
+      BUF_IO_READ fixed. Only in this way it is OK to latch it as
+      SYNC_IBUF_TREE_NODE instead of the proper SYNC_TREE_NODE (which would
+      violate the changed latching order).
+      
+      sync_thread_add_level(): Remove the special tweak for
+      SYNC_IBUF_MUTEX. Add rules for the added latching levels.
+      
+      rb:591 approved by Jimmy Yang
+    ------------------------------------------------------------
+    revno: 3560.6.3
+    committer: Georgi Kodinov <Georgi.Kodinov@Oracle.com>
+    branch nick: mysql-5.1
+    timestamp: Fri 2011-08-12 14:20:17 +0300
+    message:
+      bumped the version to 5.1.60
+    ------------------------------------------------------------
+    revno: 3560.6.2 [merge]
+    committer: Tatjana Azundris Nuernberg <tatjana.nuernberg@oracle.com>
+    branch nick: 51-9
+    timestamp: Thu 2011-08-11 13:11:34 +0100
+    message:
+      auto-merge
+    ------------------------------------------------------------
+    revno: 3560.6.1 [merge]
+    committer: Tatjana Azundris Nuernberg <tatjana.nuernberg@oracle.com>
+    branch nick: 51-9
+    timestamp: Thu 2011-08-11 12:21:50 +0100
+    message:
+      auto-merge
+        ------------------------------------------------------------
+        revno: 3560.5.1 [merge]
+        committer: Tatjana Azundris Nuernberg <tatjana.nuernberg@oracle.com>
+        branch nick: 51-2
+        timestamp: Mon 2011-08-08 17:24:43 +0100
+        message:
+          auto merge
+            ------------------------------------------------------------
+            revno: 3560.4.1 [merge]
+            committer: Tatjana Azundris Nuernberg <tatjana.nuernberg@oracle.com>
+            branch nick: 51-1
+            timestamp: Mon 2011-08-08 13:17:01 +0100
+            message:
+              merge
+                ------------------------------------------------------------
+                revno: 3560.3.1
+                committer: Tatjana Azundris Nuernberg <tatjana.nuernberg@oracle.com>
+                branch nick: 51-11758414
+                timestamp: Tue 2011-07-12 06:08:52 +0100
+                message:
+                  Bug#11758414/Bug#50614: Default storage_engine not honored when set from within a stored procedure
+                  
+                  When CREATE TABLE wasn't given ENGINE=... it would determine
+                  the default ENGINE at parse-time rather than at execution
+                  time, leading to incorrect behaviour (namely, later changes
+                  to the default engine being ignore) when calling CREATE TABLE
+                  from a stored procedure.
+                  
+                  We now defer working out the default engine till execution of
+                  CREATE TABLE.
+------------------------------------------------------------
+revno: 3602 [merge]
+committer: Tatjana Azundris Nuernberg <tatjana.nuernberg@oracle.com>
+branch nick: 51-11765687z
+timestamp: Mon 2011-10-10 15:34:29 +0100
+message:
+  auto-merge
+    ------------------------------------------------------------
+    revno: 3599.1.1
+    committer: Magne Mahre <magne.mahre@oracle.com>
+    branch nick: mysql-5.1-security
+    timestamp: Fri 2011-10-07 14:08:31 +0200
+    message:
+      BUG#12589870 CRASHES WITH MULTIQUERY PACKET + USE<DB>  + QUERY CACHE
+       
+      A buffer large enough to hold the query _plus_ some additional
+      data is allocated before parsing is started.   The additional data 
+      is used by the query cache, and consists of the name of the current 
+      database and a set of flags.
+       
+      When a packet containing multiple SQL statements is sent to the
+      server and one of the statements changes the current database
+      (a "USE <db>" statement), and the name of the new current database 
+      is longer than of the previous,  there is not enough space in the 
+      buffer for the new name, and we write out over the buffer boundary.
+      
+      The fix adds an extra field to store the number of bytes
+      allocated to the database name in the buffer.  If the current
+      database name changes, and the new name is longer than the
+      previous one, we refuse to cache the query.
+------------------------------------------------------------
+revno: 3601 [merge]
+committer: Tatjana Azundris Nuernberg <tatjana.nuernberg@oracle.com>
+branch nick: 51-11765687z
+timestamp: Thu 2011-10-06 11:35:01 +0100
+message:
+  manual merge
+    ------------------------------------------------------------
+    revno: 1810.3997.33
+    committer: Tatjana Azundris Nuernberg <tatjana.nuernberg@oracle.com>
+    branch nick: 50-11765687z
+    timestamp: Thu 2011-10-06 11:23:46 +0100
+    message:
+      additional clean-up for 11765687
+------------------------------------------------------------
+revno: 3600 [merge]
+committer: Tatjana Azundris Nuernberg <tatjana.nuernberg@oracle.com>
+branch nick: 51-11765687z
+timestamp: Thu 2011-09-29 10:56:21 +0100
+message:
+  manual merge
+    ------------------------------------------------------------
+    revno: 1810.3997.32
+    committer: Tatjana Azundris Nuernberg <tatjana.nuernberg@oracle.com>
+    branch nick: 50-11765687z
+    timestamp: Thu 2011-09-29 10:47:11 +0100
+    message:
+      Bug#11765687 (MySQL58677): No privilege on table / view, but can know #rows / underlying table's name
+      
+      1 - If a user had SHOW VIEW and SELECT privileges on a view and
+      this view was referencing another view, EXPLAIN SELECT on the outer
+      view (that the user had privileges on) could reveal the structure
+      of the underlying "inner" view as well as the number of rows in
+      the underlying tables, even if the user had privileges on none of
+      these referenced objects.
+      
+      This happened because we used DEFINER's UID ("SUID") not just for
+      the view given in EXPLAIN, but also when checking privileges on
+      the underlying views (where we should use the UID of the EXPLAIN's
+      INVOKER instead).
+      
+      We no longer run the EXPLAIN SUID (with DEFINER's privileges).
+      This prevents a possible exploit and makes permissions more
+      orthogonal.
+      
+      2 - EXPLAIN SELECT would reveal a view's structure even if the user
+      did not have SHOW VIEW privileges for that view, as long as they
+      had SELECT privilege on the underlying tables.
+      
+      Instead of requiring both SHOW VIEW privilege on a view and SELECT
+      privilege on all underlying tables, we were checking for presence
+      of either of them.
+      
+      We now explicitly require SHOW VIEW and SELECT privileges on
+      the view we run EXPLAIN SELECT on, as well as all its
+      underlying views. We also require SELECT on all relevant
+      tables. 
+------------------------------------------------------------
+revno: 3599
+committer: Alexander Nozdrin <alexander.nozdrin@oracle.com>
+branch nick: mysql-5.1-security
+timestamp: Thu 2011-09-22 18:31:16 +0400
+message:
+  Fix for Bug#13001491: MYSQL_REFRESH CRASHES WHEN STORED ROUTINES ARE RUN CONCURRENTLY.
+  
+  The main problem was that lex_start() was forgotten to be called before processing
+  COM_REFRESH.
+  
+  Another problem discovered was that if failures to flush the error log were not properly
+  handled, which resulted in the server crash.
+  
+  The user-visible effect of these problems were:
+    - if COM_REFRESH command was sent after SQL-queries of some sort,
+      the server would crash.
+    - if COM_REFRESH was requested with REFRESH_LOG only, and the error log
+      failed to flush, the server would crash. The error log fails to flush
+      when it points to unavailable file (for example, due to restricted
+      permissions).
+  
+  The fixes are:
+    - call lex_start() in the beginning of COM_REFRESH;
+    - handle failures to flush the error log properly, i.e. raise ER_UNKNOWN_ERROR.
+------------------------------------------------------------
+revno: 3598 [merge]
+committer: Mattias Jonsson <mattias.jonsson@oracle.com>
+branch nick: topush-5.1-sec
+timestamp: Thu 2011-09-15 19:26:38 +0200
+message:
+  merge into 5.1-sec of bug#11766879.
+    ------------------------------------------------------------
+    revno: 3560.2.1
+    committer: Mattias Jonsson <mattias.jonsson@oracle.com>
+    branch nick: b11766879-51
+    timestamp: Tue 2011-08-23 15:13:17 +0200
+    message:
+      Bug#11766879/Bug#60106: DIFF BETWEEN # OF INDEXES IN MYSQL VS INNODB,
+      PARTITONING, ON INDEX CREATE
+      
+      If the first partition succeeded in adding a index, but a successive partition failed,
+      then the first partition had still the new index.
+      
+      The fix reverts the added indexes from previous partitions on failure.
+------------------------------------------------------------
+revno: 3597 [merge]
+committer: Georgi Kodinov <Georgi.Kodinov@Oracle.com>
+branch nick: mysql-5.1-security
+timestamp: Wed 2011-08-17 13:25:33 +0300
+message:
+  merge mysql-5.0-security->mysql-5.1-security
+    ------------------------------------------------------------
+    revno: 1810.3997.31
+    committer: Georgi Kodinov <Georgi.Kodinov@Oracle.com>
+    branch nick: mysql-5.0-security
+    timestamp: Wed 2011-08-17 13:13:44 +0300
+    message:
+      changed the old @sun.com address of security trees.
+------------------------------------------------------------
+revno: 3596
+committer: Karen Langford <karen.langford@oracle.com>
+branch nick: mysql-5.1-security
+timestamp: Thu 2011-08-11 15:31:25 +0200
+message:
+  Raise version number after cloning 5.1.59
+------------------------------------------------------------
+revno: 3595
+tags: mysql-5.1.59, clone-5.1.59-build
+committer: Marko M?kel? <marko.makela@oracle.com>
+branch nick: mysql-5.1-security
+timestamp: Wed 2011-08-10 14:56:14 +0300
+message:
+  Bug#12626794 61240: UNUSED FUNCTIONS ...
